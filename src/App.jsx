@@ -3,23 +3,14 @@ import Plot from 'react-plotly.js';
 import { Style } from './App';
 
 function FourierSeries() {
-  // State para armazenar a amplitude da série de Fourier
   const [amplitude, setAmplitude] = useState(1);
-
-  // State para armazenar a largura da série de Fourier
   const [width, setWidth] = useState(1);
-
-  // State para armazenar a quantidade de harmônicos a serem usados
   const [harmonics, setHarmonics] = useState(5);
-
-  // State para armazenar o tempo (variável de entrada)
   const [time, setTime] = useState(1);
-
-  // State para armazenar os dados da série de Fourier
   const [data, setData] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Função para calcular a série de Fourier
     const calculateFourierSeries = () => {
       const seriesData = [];
       const numPoints = 1000; // Número de pontos para o gráfico
@@ -34,7 +25,9 @@ function FourierSeries() {
         for (let n = 1; n <= harmonics; n++) {
           // Fórmula da série de Fourier para uma onda quadrada
           const frequency = 2 * n - 1;
-          const term = (4 * amplitude / (Math.PI * frequency)) * Math.sin((2 * Math.PI * frequency * t) / width);
+          const term =
+            ((4 * amplitude) / (Math.PI * frequency)) *
+            Math.sin((2 * Math.PI * frequency * t) / width);
           sum += term;
         }
 
@@ -47,9 +40,48 @@ function FourierSeries() {
     // Calcula a série de Fourier e atualiza o state 'data'
     const seriesData = calculateFourierSeries();
     setData(seriesData);
-  }, [amplitude, width, harmonics, time]); // Dependências do useEffect
+  }, [amplitude, width, harmonics, time]);
 
-  // Configuração dos dados do gráfico Plotly
+  const handleAmplitudeChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setAmplitude(parseFloat(value));
+      setError('');
+    } else {
+      setError('Digite um número válido para Amplitude.');
+    }
+  };
+
+  const handleWidthChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setWidth(parseFloat(value));
+      setError('');
+    } else {
+      setError('Digite um número válido para Largura.');
+    }
+  };
+
+  const handleHarmonicsChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*$/.test(value)) {
+      setHarmonics(parseInt(value));
+      setError('');
+    } else {
+      setError('Digite um número válido para Harmônicos.');
+    }
+  };
+
+  const handleTimeChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setTime(parseFloat(value));
+      setError('');
+    } else {
+      setError('Digite um número válido para Tempo.');
+    }
+  };
+
   const plotData = [
     {
       type: 'scatter',
@@ -59,7 +91,6 @@ function FourierSeries() {
     },
   ];
 
-  // Configuração do layout do gráfico Plotly
   const layout = {
     xaxis: { title: 'Tempo (s)' },
     yaxis: { title: 'Amplitude (V)' },
@@ -67,49 +98,43 @@ function FourierSeries() {
 
   return (
     <Style>
-
-    <header>
-      <h1>Universidade Santa Cecília - Comunicações Digitais</h1>
-      <h2>Neemias Vieira | Matheus Mota | Gabriel Nascimento | João Victor</h2>
-    </header>
-    <div>
-      <section>
-      <h1 className='title'>Série de Fourier</h1>
-      <div className="divInput">
-        <label>Amplitude (V)</label>
-        <input
-          type="number"
-          value={amplitude}
-          onChange={(e) => setAmplitude(parseFloat(e.target.value))}
-        />
+      <header>
+        <h1>Universidade Santa Cecília - Comunicações Digitais</h1>
+        <h2>
+          Neemias Vieira | Matheus Mota | Gabriel Nascimento | João Victor
+        </h2>
+      </header>
+      <div>
+        <section>
+          <h1 className='title'>Série de Fourier</h1>
+          <div className='divInput'>
+            <label>Amplitude (V)</label>
+            <input
+              type='text'
+              value={amplitude}
+              onChange={handleAmplitudeChange}
+            />
+          </div>
+          <div className='divInput'>
+            <label>Largura (s)</label>
+            <input type='text' value={width} onChange={handleWidthChange} />
+          </div>
+          <div className='divInput'>
+            <label>Harmônicos</label>
+            <input
+              type='text'
+              value={harmonics}
+              onChange={handleHarmonicsChange}
+            />
+          </div>
+          <div className='divInput'>
+            <label>Tempo (s)</label>
+            <input type='text' value={time} onChange={handleTimeChange} />
+          </div>
+          {error && <p className='error'>{error}</p>}
+        </section>
+        <Plot data={plotData} layout={layout} />
       </div>
-      <div className="divInput">
-        <label>Largura (s)</label>
-        <input
-          type="number"
-          value={width}
-          onChange={(e) => setWidth(parseFloat(e.target.value))}
-        />
-      </div>
-      <div className="divInput">
-        <label>Harmônicos</label>
-        <input
-          type="number"
-          value={harmonics}
-          onChange={(e) => setHarmonics(parseInt(e.target.value))}
-        />
-      </div>
-      <div className="divInput">
-        <label>Tempo (s)</label>
-        <input
-          type="number"
-          value={time}
-          onChange={(e) => setTime(parseFloat(e.target.value))}
-        />
-      </div>
-      </section>
-      <Plot data={plotData} layout={layout} />
-    </div>
     </Style>
   );
 }
