@@ -44,7 +44,7 @@ export const Style = styled.main`
     gap: 20px;
     width: 200px;
 
-    input[type='text'] {
+    input {
       width: 50px;
       padding: 10px;
       border: 1px solid #ccc;
@@ -53,7 +53,7 @@ export const Style = styled.main`
       transition: border-color 0.3s;
     }
 
-    input[type='text']:focus {
+    input:focus {
       border-color: #007bff;
     }
 

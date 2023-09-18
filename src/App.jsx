@@ -44,7 +44,7 @@ function FourierSeries() {
 
   const handleAmplitudeChange = (e) => {
     const value = e.target.value;
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
       setAmplitude(parseFloat(value));
       setError('');
     } else {
@@ -54,7 +54,7 @@ function FourierSeries() {
 
   const handleWidthChange = (e) => {
     const value = e.target.value;
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
       setWidth(parseFloat(value));
       setError('');
     } else {
@@ -64,7 +64,7 @@ function FourierSeries() {
 
   const handleHarmonicsChange = (e) => {
     const value = e.target.value;
-    if (value === '' || /^\d*$/.test(value)) {
+    if (value === '' || /^-?\d*$/.test(value)) {
       setHarmonics(parseInt(value));
       setError('');
     } else {
@@ -74,7 +74,7 @@ function FourierSeries() {
 
   const handleTimeChange = (e) => {
     const value = e.target.value;
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
       setTime(parseFloat(value));
       setError('');
     } else {
@@ -91,8 +91,34 @@ function FourierSeries() {
     },
   ];
 
+  // Cálculo do espectro da série de Fourier
+  const calculateSpectrum = (amplitude) => {
+    const spectrumData = [];
+    for (let n = 1; n <= harmonics; n++) {
+      const frequency = 2 * n - 1;
+      const term = (4 * amplitude) / (Math.PI * frequency);
+      spectrumData.push({ x: frequency, y: term });
+    }
+    return spectrumData;
+  };
+
+  const spectrumData = calculateSpectrum(amplitude);
+
+  const spectrumPlotData = [
+    {
+      type: 'bar',
+      x: spectrumData.map((point) => point.x),
+      y: spectrumData.map((point) => point.y),
+    },
+  ];
+
   const layout = {
     xaxis: { title: 'Tempo (s)' },
+    yaxis: { title: 'Amplitude (V)' },
+  };
+
+  const spectrumLayout = {
+    xaxis: { title: 'Frequência (Hz)' },
     yaxis: { title: 'Amplitude (V)' },
   };
 
@@ -110,30 +136,43 @@ function FourierSeries() {
           <div className='divInput'>
             <label>Amplitude (V)</label>
             <input
-              type='text'
+              type='number'
+              step='any'
               value={amplitude}
               onChange={handleAmplitudeChange}
             />
           </div>
           <div className='divInput'>
             <label>Largura (s)</label>
-            <input type='text' value={width} onChange={handleWidthChange} />
+            <input
+              type='number'
+              step='any'
+              value={width}
+              onChange={handleWidthChange}
+            />
           </div>
           <div className='divInput'>
             <label>Harmônicos</label>
             <input
-              type='text'
+              type='number'
+              step='1'
               value={harmonics}
               onChange={handleHarmonicsChange}
             />
           </div>
           <div className='divInput'>
             <label>Tempo (s)</label>
-            <input type='text' value={time} onChange={handleTimeChange} />
+            <input
+              type='number'
+              step='any'
+              value={time}
+              onChange={handleTimeChange}
+            />
           </div>
           {error && <p className='error'>{error}</p>}
         </section>
         <Plot data={plotData} layout={layout} />
+        <Plot data={spectrumPlotData} layout={spectrumLayout} />
       </div>
     </Style>
   );
